@@ -129,4 +129,17 @@ export class UsersService {
     }
     return user;
   }
+
+  async findByUsuarioId(usuarioId: string): Promise<Cliente> {
+    const cliente = await this.clienteRepository.findOne({
+      where: { usuario: { id_generated: usuarioId } },
+      relations: ['usuario'],
+    });
+
+    if (!cliente) {
+      throw new Error('Cliente no encontrado');
+    }
+
+    return cliente;
+  }
 }
