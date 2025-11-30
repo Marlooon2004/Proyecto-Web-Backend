@@ -29,40 +29,6 @@ export class UsersService {
   ) {}
 
   //mostrar municipios
-  async onModuleInit() {
-    await this.cargarMunicipiosPorDefecto();
-  }
-
-  async cargarMunicipiosPorDefecto(): Promise<void> {
-    const municipios = [
-      { nombre_mun: 'La Habana Vieja' },
-      { nombre_mun: 'Centro Habana' },
-      { nombre_mun: 'Plaza de la Revolución' },
-      { nombre_mun: 'Cerro' },
-      { nombre_mun: 'Diez de Octubre' },
-      { nombre_mun: 'Marianao' },
-      { nombre_mun: 'Playa' },
-      { nombre_mun: 'Boyeros' },
-      { nombre_mun: 'Arroyo Naranjo' },
-      { nombre_mun: 'Cotorro' },
-      { nombre_mun: 'Regla' },
-      { nombre_mun: 'Guanabacoa' },
-      { nombre_mun: 'San Miguel del Padrón' },
-      { nombre_mun: 'Lisa' },
-      { nombre_mun: 'Habana del Este' },
-    ];
-
-    for (const municipioData of municipios) {
-      const municipioExiste = await this.municipioRepository.findOne({
-        where: { nombre_mun: municipioData.nombre_mun },
-      });
-
-      if (!municipioExiste) {
-        await this.municipioRepository.save(municipioData);
-      }
-    }
-  }
-
   async obtenerTodosLosMunicipios(): Promise<Municipio[]> {
     return await this.municipioRepository.find({
       order: {

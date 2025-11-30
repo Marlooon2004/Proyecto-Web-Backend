@@ -19,7 +19,6 @@ import { UsersModule } from './users/user.module';
       password: 'marlon12345',
       database: 'proyecto_web',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true,
       logging: true,
     }),
 
