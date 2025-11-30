@@ -1,7 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 //import necesarias
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -40,7 +42,6 @@ export class UsersService {
     });
   }
 
-  //crear cliente - usuario
   async createNewUser(
     createUserDto: CreateUserDTO,
   ): Promise<{ cliente: Cliente; usuario: Usuario }> {
@@ -69,35 +70,63 @@ export class UsersService {
       );
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
-    //creacion usuario
-    const nuevoUsuario = this.usuarioRepository.create({
-      usuario: createUserDto.username,
-      contrasenya: hashedPassword,
-      rol: 'Cliente',
+    const queryRunner =
+      this.usuarioRepository.manager.connection.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const nuevoUsuario = this.usuarioRepository.create({
+        usuario: createUserDto.username,
+        contrasenya: hashedPassword,
+      });
+
+      const usuarioGuardado = await queryRunner.manager.save(nuevoUsuario);
+
+      // Crear cliente
+      const cliente = this.clienteRepository.create({
+        carnet: createUserDto.CI,
+        nombre: createUserDto.firstName,
+        apellidos: createUserDto.lastName,
+        edad: createUserDto.age,
+        sexo: createUserDto.sex,
+        telef_contacto: createUserDto.phoneNumber,
+        nombre_mun: createUserDto.municipality,
+        correo: createUserDto.email,
+        usuario: { id_generated: usuarioGuardado.id_generated } as Usuario,
+      });
+
+      const clienteGuardado = await queryRunner.manager.save(cliente);
+
+      await queryRunner.commitTransaction();
+
+      console.log(`Usuario creado: ${usuarioGuardado.usuario}`);
+      return {
+        cliente: clienteGuardado,
+        usuario: usuarioGuardado,
+      };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      console.error('Error en createNewUser:', error);
+      throw new Error(
+        'No se pudo completar el registro. Por favor, intente nuevamente.',
+      );
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  //autenticacion
+  async findByUsername(nombre_usuario: string): Promise<Usuario> {
+    const user = await this.usuarioRepository.findOne({
+      where: { usuario: nombre_usuario },
     });
-
-    const usuarioGuardado = await this.usuarioRepository.save(nuevoUsuario);
-
-    const cliente = new Cliente();
-    cliente.carnet = createUserDto.CI;
-    cliente.nombre = createUserDto.firstName;
-    cliente.apellidos = createUserDto.lastName;
-    cliente.edad = createUserDto.age;
-    cliente.sexo = createUserDto.sex;
-    cliente.telef_contacto = createUserDto.phoneNumber;
-    cliente.nombre_mun = createUserDto.municipality;
-    cliente.correo = createUserDto.email;
-    cliente.id_usuario = usuarioGuardado.id_generated;
-
-    const clienteGuardado = await this.clienteRepository.save(cliente);
-
-    console.log(`Usuario creado: ${usuarioGuardado.usuario}`);
-    return {
-      cliente: clienteGuardado,
-      usuario: usuarioGuardado,
-    };
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+    return user;
   }
 }

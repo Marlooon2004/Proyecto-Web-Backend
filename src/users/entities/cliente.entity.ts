@@ -42,9 +42,6 @@ export class Cliente {
   @JoinColumn({ name: 'id_usuario' })
   usuario: Usuario;
 
-  @Column({ unique: true })
-  id_usuario: string;
-
   @BeforeInsert()
   generateId() {
     if (!this.id_generated) {

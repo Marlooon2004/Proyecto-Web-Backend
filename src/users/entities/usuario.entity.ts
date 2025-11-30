@@ -2,9 +2,9 @@ import {
   Entity,
   PrimaryColumn,
   Column,
-  OneToOne,
   JoinColumn,
   BeforeInsert,
+  ManyToOne,
 } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { Rol } from './rol.entity';
@@ -20,17 +20,17 @@ export class Usuario {
   @Column()
   contrasenya: string;
 
-  @OneToOne(() => Rol)
+  @ManyToOne(() => Rol)
   @JoinColumn({ name: 'rol', referencedColumnName: 'rol' })
   rolInfo: Rol;
-
-  @Column()
-  rol: string;
 
   @BeforeInsert()
   generateId() {
     if (!this.id_generated) {
       this.id_generated = uuidv4();
+    }
+    if (!this.rolInfo) {
+      this.rolInfo = { rol: 'Cliente' } as Rol;
     }
   }
 }
