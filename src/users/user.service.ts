@@ -14,8 +14,8 @@ import { Rol } from './entities/rol.entity';
 import { Usuario } from './entities/usuario.entity';
 //dto
 import { CreateUserDTO } from './dto/create-user.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 //import { UpdateUserDto } from './dto/update-user.dto';
-//import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
 export class UsersService {
@@ -141,5 +141,34 @@ export class UsersService {
     }
 
     return cliente;
+  }
+
+  async changePassword(
+    usuarioId: string,
+    changePasswordDto: ChangePasswordDto,
+  ): Promise<{ message: string }> {
+    const cliente = await this.findByUsuarioId(usuarioId);
+    if (!cliente) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+    const esContrasenyaActualCorrecta = await bcrypt.compare(
+      changePasswordDto.currentPassword,
+      cliente.usuario.contrasenya,
+    );
+
+    if (!esContrasenyaActualCorrecta) {
+      throw new ConflictException('La contraseña actual es incorrecta');
+    }
+
+    if (changePasswordDto.newPassword.length < 8) {
+      throw new ConflictException(
+        'La nueva contraseña debe tener al menos 8 caracteres',
+      );
+    }
+
+    const hashedPassword = await bcrypt.hash(changePasswordDto.newPassword, 10);
+    cliente.usuario.contrasenya = hashedPassword;
+    await this.usuarioRepository.save(cliente.usuario);
+    return { message: 'Contraseña cambiada exitosamente' };
   }
 }

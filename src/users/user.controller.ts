@@ -1,8 +1,20 @@
+//dto
 import { CreateUserDTO } from './dto/create-user.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+//paquetes
 import { UsersService } from './user.service';
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+//otros imports
+import { Body, Controller, Get, Param, Patch, Post, Req } from '@nestjs/common';
 import { Request } from 'express';
 import { Public } from '../auth/decorators/public.decorator';
+
+interface AuthenticatedRequest extends Request {
+  user: {
+    userId: string;
+    username: string;
+    rol: string;
+  };
+}
 
 @Controller('users')
 export class UsersController {
@@ -24,5 +36,14 @@ export class UsersController {
   @Get('usuario/:usuarioId')
   getUserByUsername(@Param('usuarioId') usuarioId: string) {
     return this.usersService.findByUsuarioId(usuarioId);
+  }
+  //actualizar contrasenya usuario
+  @Patch('password')
+  changePassword(
+    @Req() request: AuthenticatedRequest,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
+    const usuarioId = request.user.userId;
+    return this.usersService.changePassword(usuarioId, changePasswordDto);
   }
 }
