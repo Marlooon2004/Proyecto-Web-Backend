@@ -1,10 +1,20 @@
 //dto
 import { CreateUserDTO } from './dto/create-user.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 //paquetes
 import { UsersService } from './user.service';
 //otros imports
-import { Body, Controller, Get, Param, Patch, Post, Req } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Req,
+} from '@nestjs/common';
 import { Request } from 'express';
 import { Public } from '../auth/decorators/public.decorator';
 
@@ -45,5 +55,14 @@ export class UsersController {
   ) {
     const usuarioId = request.user.userId;
     return this.usersService.changePassword(usuarioId, changePasswordDto);
+  }
+  //modificar perfil
+  @Put('profile')
+  updateProfile(
+    @Req() request: AuthenticatedRequest,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    const usuarioId = request.user.userId;
+    return this.usersService.update(usuarioId, updateUserDto);
   }
 }

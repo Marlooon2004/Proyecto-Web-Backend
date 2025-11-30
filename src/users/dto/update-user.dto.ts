@@ -43,4 +43,9 @@ export class UpdateUserDto {
   @IsString()
   @IsNotEmpty()
   username: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @MinLength(11)
+  CI: string;
 }
