@@ -7,15 +7,15 @@ export class ContratoController {
   constructor(private readonly contratosService: ContratoService) {}
 
   @Public()
-  @Get(':usuarioId')
-  getUserByUsername(@Param('usuarioId') usuarioId: string) {
-    return this.contratosService.findContractByUsuarioId(usuarioId);
-  }
-
-  @Public()
   @Get('scooters')
   getAllScooters() {
     return this.contratosService.getScooters();
+  }
+
+  @Public()
+  @Get('tourings')
+  getAllTourings() {
+    return this.contratosService.getTouring();
   }
 
   @Public()
@@ -37,14 +37,14 @@ export class ContratoController {
   }
 
   @Public()
-  @Get('tourings')
-  getAllTourings() {
-    return this.contratosService.getTouring();
-  }
-
-  @Public()
   @Get('motocross')
   getAllMotocross() {
     return this.contratosService.getMotocross();
+  }
+
+  @Public()
+  @Get(':usuarioId')
+  getUserByUsername(@Param('usuarioId') usuarioId: string) {
+    return this.contratosService.findContractByUsuarioId(usuarioId);
   }
 }
