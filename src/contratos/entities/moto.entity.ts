@@ -27,4 +27,10 @@ export class Moto {
 
   @Column()
   descripcion: string;
+
+  @Column()
+  categoria: string;
+
+  @Column()
+  costo_dia: number;
 }

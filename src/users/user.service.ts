@@ -78,6 +78,11 @@ export class UsersService {
         'Ya existe un usuario registrado con este numero de telefono',
       );
     }
+
+    const municipioExistente = await this.municipioRepository.findOne({
+      where: { nombre_mun: createUserDto.municipality },
+    });
+
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
     const queryRunner =
@@ -102,7 +107,7 @@ export class UsersService {
         edad: createUserDto.age,
         sexo: createUserDto.sex,
         telef_contacto: createUserDto.phoneNumber,
-        nombre_mun: createUserDto.municipality,
+        municipio: { nombre_mun: municipioExistente?.nombre_mun } as Municipio,
         correo: createUserDto.email,
         usuario: { id_generated: usuarioGuardado.id_generated } as Usuario,
       });
@@ -141,7 +146,7 @@ export class UsersService {
   async findByUsuarioId(usuarioId: string): Promise<Cliente> {
     const cliente = await this.clienteRepository.findOne({
       where: { usuario: { id_generated: usuarioId } },
-      relations: ['usuario'],
+      relations: ['usuario', 'municipio'],
     });
 
     if (!cliente) {
@@ -261,10 +266,18 @@ export class UsersService {
     }
     if (updateUserDto.phoneNumber !== undefined)
       cliente.telef_contacto = updateUserDto.phoneNumber;
-    if (updateUserDto.municipality !== undefined)
-      cliente.nombre_mun = updateUserDto.municipality;
     if (updateUserDto.email !== undefined) cliente.correo = updateUserDto.email;
     if (updateUserDto.CI !== undefined) cliente.carnet = updateUserDto.CI;
+
+    if (
+      updateUserDto.municipality &&
+      updateUserDto.municipality !== cliente.municipio?.nombre_mun
+    ) {
+      const nuevoMunicipio = await this.municipioRepository.findOne({
+        where: { nombre_mun: updateUserDto.municipality },
+      });
+      if (nuevoMunicipio) cliente.municipio = nuevoMunicipio;
+    }
 
     if (
       updateUserDto.username &&

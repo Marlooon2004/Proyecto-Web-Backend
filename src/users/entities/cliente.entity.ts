@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { Usuario } from './usuario.entity';
+import { Municipio } from './municipio.entity';
 
 @Entity('clientes')
 export class Cliente {
@@ -32,8 +33,9 @@ export class Cliente {
   @Column()
   telef_contacto: string;
 
-  @Column()
-  nombre_mun: string;
+  @OneToOne(() => Municipio)
+  @JoinColumn({ name: 'nombre_mun' })
+  municipio: Municipio;
 
   @Column()
   correo: string;

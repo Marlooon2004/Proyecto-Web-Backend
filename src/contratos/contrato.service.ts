@@ -66,4 +66,82 @@ export class ContratoService {
     }
     return contratos;
   }
+
+  //obtener scooters
+  async getScooters() {
+    const scooters = await this.motoRepository.find({
+      where: { categoria: 'Scooters' },
+    });
+    if (!scooters || scooters.length === 0) {
+      throw new NotFoundException(
+        'No se encontraron motos de la categoria Scooters',
+      );
+    }
+    return scooters;
+  }
+
+  //obtener sports motorcicles
+  async getSports() {
+    const sports = await this.motoRepository.find({
+      where: { categoria: 'Sport' },
+    });
+    if (!sports || sports.length === 0) {
+      throw new NotFoundException(
+        'No se encontraron motos de la categoria Sport',
+      );
+    }
+    return sports;
+  }
+
+  //obtener street motorcicles
+  async getStreets() {
+    const street = await this.motoRepository.find({
+      where: { categoria: 'Street' },
+    });
+    if (!street || street.length === 0) {
+      throw new NotFoundException(
+        'No se encontraron motos de la categoria Street',
+      );
+    }
+    return street;
+  }
+
+  //obtener touring motorcicles
+  async getTouring() {
+    const touring = await this.motoRepository.find({
+      where: { categoria: 'Touring' },
+    });
+    if (!touring || touring.length === 0) {
+      throw new NotFoundException(
+        'No se encontraron motos de la categoria Touring',
+      );
+    }
+    return touring;
+  }
+
+  //obtener motocross motorcicles
+  async getMotocross() {
+    const motocross = await this.motoRepository.find({
+      where: { categoria: 'Motocross' },
+    });
+    if (!motocross || motocross.length === 0) {
+      throw new NotFoundException(
+        'No se encontraron motos de la categoria Motocross',
+      );
+    }
+    return motocross;
+  }
+
+  //obtener custom motorcicles
+  async getCustom() {
+    const custom = await this.motoRepository.find({
+      where: { categoria: 'Custom' },
+    });
+    if (!custom || custom.length === 0) {
+      throw new NotFoundException(
+        'No se encontraron motos de la categoria Custom',
+      );
+    }
+    return custom;
+  }
 }

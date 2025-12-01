@@ -11,4 +11,40 @@ export class ContratoController {
   getUserByUsername(@Param('usuarioId') usuarioId: string) {
     return this.contratosService.findContractByUsuarioId(usuarioId);
   }
+
+  @Public()
+  @Get('scooters')
+  getAllScooters() {
+    return this.contratosService.getScooters();
+  }
+
+  @Public()
+  @Get('sports')
+  getAllSports() {
+    return this.contratosService.getSports();
+  }
+
+  @Public()
+  @Get('streets')
+  getAllStreets() {
+    return this.contratosService.getStreets();
+  }
+
+  @Public()
+  @Get('customs')
+  getAllCustoms() {
+    return this.contratosService.getCustom();
+  }
+
+  @Public()
+  @Get('tourings')
+  getAllTourings() {
+    return this.contratosService.getTouring();
+  }
+
+  @Public()
+  @Get('motocross')
+  getAllMotocross() {
+    return this.contratosService.getMotocross();
+  }
 }
