@@ -17,8 +17,13 @@ import { CreateUserDTO } from './dto/create-user.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
+interface MunicipioResponse {
+  nombre_mun: string;
+}
+
 @Injectable()
 export class UsersService {
+  private allMunicipiosCache: MunicipioResponse[] | null = null;
   constructor(
     @InjectRepository(Usuario)
     private usuarioRepository: Repository<Usuario>,
@@ -35,11 +40,20 @@ export class UsersService {
 
   //mostrar municipios
   async obtenerTodosLosMunicipios(): Promise<Municipio[]> {
-    return await this.municipioRepository.find({
+    if (this.allMunicipiosCache) {
+      return this.allMunicipiosCache;
+    }
+
+    const municipios = await this.municipioRepository.find({
       order: {
         nombre_mun: 'ASC',
       },
     });
+
+    this.allMunicipiosCache = municipios.map((municipio) => ({
+      nombre_mun: municipio.nombre_mun,
+    }));
+    return this.allMunicipiosCache;
   }
 
   async createNewUser(
