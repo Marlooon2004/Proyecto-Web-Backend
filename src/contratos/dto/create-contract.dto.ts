@@ -5,14 +5,9 @@ import {
   IsNumber,
   IsDate,
   Length,
-  IsBoolean,
 } from 'class-validator';
 
 export class CreateContractDTO {
-  @IsString()
-  @IsNotEmpty()
-  id: string;
-
   @IsString()
   @IsNotEmpty()
   idCliente: string;
@@ -27,10 +22,6 @@ export class CreateContractDTO {
   @Type(() => Date)
   fechaFin: Date;
 
-  @IsNumber()
-  @Type(() => Number)
-  diasProrroga: number;
-
   @IsNotEmpty()
   @IsString()
   @Length(1)
@@ -43,17 +34,8 @@ export class CreateContractDTO {
 
   @IsString()
   @IsNotEmpty()
-  idTarifa: string;
-
-  @IsString()
-  @IsNotEmpty()
   idMoto: string;
 
-  @IsBoolean()
-  contratoActivo: boolean;
-
-  @IsNotEmpty()
-  @IsDate()
-  @Type(() => Date)
-  fechaCancelacion: Date;
+  @IsNumber()
+  costoTotal: number;
 }

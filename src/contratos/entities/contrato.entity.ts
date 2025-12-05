@@ -36,7 +36,7 @@ export class Contrato {
   @Column({ length: 1 })
   seguro: string;
 
-  @ManyToOne(() => Tarifa)
+  @OneToOne(() => Tarifa)
   @JoinColumn({ name: 'cod_tarifa' })
   tarifa: Tarifa;
 
@@ -44,11 +44,11 @@ export class Contrato {
   @JoinColumn({ name: 'id_moto' })
   moto: Moto;
 
-  @Column()
+  @Column({ default: true })
   contrato_activo: boolean;
 
-  @Column()
-  fecha_cancelacion: Date;
+  @Column({ type: 'date', nullable: true })
+  fecha_cancelacion: Date | null;
 
   @BeforeInsert()
   generateId() {

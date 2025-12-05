@@ -1,10 +1,17 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { ContratoService } from './contrato.service';
+import { CreateContractDTO } from './dto/create-contract.dto';
 
 @Controller('contratos')
 export class ContratoController {
   constructor(private readonly contratosService: ContratoService) {}
+
+  @Public()
+  @Post()
+  createNewContract(@Body() createContractDTO: CreateContractDTO) {
+    return this.contratosService.crearNuevoContrato(createContractDTO);
+  }
 
   @Public()
   @Get('scooters')
