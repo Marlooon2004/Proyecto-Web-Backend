@@ -29,24 +29,28 @@ interface AuthenticatedRequest extends Request {
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
   //obtener municipios para componente registro y cuenta de perfil
   @Public()
   @Get('municipios')
   async obtenerMunicipios() {
     return await this.usersService.obtenerTodosLosMunicipios();
   }
+
   //crear nuevo usuario
   @Public()
   @Post()
   create(@Body() createUserDto: CreateUserDTO) {
     return this.usersService.createNewUser(createUserDto);
   }
+
   //obtener usuario para cargar datos para cuenta perfil
   @Public()
   @Get('usuario/:usuarioId')
   getUserByUsername(@Param('usuarioId') usuarioId: string) {
     return this.usersService.findByUsuarioId(usuarioId);
   }
+
   //actualizar contrasenya usuario
   @Patch('password')
   changePassword(
@@ -56,6 +60,7 @@ export class UsersController {
     const usuarioId = request.user.userId;
     return this.usersService.changePassword(usuarioId, changePasswordDto);
   }
+
   //modificar perfil
   @Put('profile')
   updateProfile(

@@ -82,6 +82,9 @@ export class UsersService {
     const municipioExistente = await this.municipioRepository.findOne({
       where: { nombre_mun: createUserDto.municipality },
     });
+    if (!municipioExistente) {
+      throw new NotFoundException('Municipio no encontrado');
+    }
 
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
@@ -132,7 +135,6 @@ export class UsersService {
     }
   }
 
-  //autenticacion
   async findByUsername(nombre_usuario: string): Promise<Usuario> {
     const user = await this.usuarioRepository.findOne({
       where: { usuario: nombre_usuario },

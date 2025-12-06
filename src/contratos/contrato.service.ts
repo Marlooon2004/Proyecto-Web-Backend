@@ -73,197 +73,84 @@ export class ContratoService {
     return contratos;
   }
 
+  //obtener motos segun categoria
+  async getMotos(categoriaMotos: string) {
+    const motos = await this.motoRepository.find({
+      where: { categoria: categoriaMotos },
+      relations: ['modelo', 'modelo.marca'],
+    });
+    if (!motos || motos.length == 0) {
+      throw new NotFoundException(
+        'No se encontraron motos de la categoria: ' + categoriaMotos,
+      );
+    }
+    return motos.map((moto) => ({
+      id_generated: moto.id_generated,
+      matricula: moto.matricula,
+      color: moto.color,
+      cantd_km: moto.cantd_km,
+      modelo: moto.modelo?.modelo || 'Sin modelo',
+      marca: moto.modelo?.marca?.marca || 'Sin marca',
+      situacion: moto.situacion,
+      ruta_imagen: moto.ruta_imagen,
+      descripcion: moto.descripcion,
+      categoria: moto.categoria,
+      costo_dia: moto.costo_dia,
+      image: moto.ruta_imagen,
+      price: moto.costo_dia,
+    }));
+  }
+
   //obtener scooters
   async getScooters() {
-    const scooters = await this.motoRepository.find({
-      where: { categoria: 'Scooters' },
-      relations: ['modelo', 'modelo.marca'],
-    });
-    if (!scooters || scooters.length === 0) {
-      throw new NotFoundException(
-        'No se encontraron motos de la categoria Scooters',
-      );
-    }
-    return scooters.map((moto) => ({
-      id_generated: moto.id_generated,
-      matricula: moto.matricula,
-      color: moto.color,
-      cantd_km: moto.cantd_km,
-      modelo: moto.modelo?.modelo || 'Sin modelo',
-      marca: moto.modelo?.marca?.marca || 'Sin marca',
-      situacion: moto.situacion,
-      ruta_imagen: moto.ruta_imagen,
-      descripcion: moto.descripcion,
-      categoria: moto.categoria,
-      costo_dia: moto.costo_dia,
-      image: moto.ruta_imagen,
-      price: moto.costo_dia,
-    }));
+    return this.getMotos('Scooters');
   }
 
-  //obtener touring motorcicles
+  //obtener touring
   async getTouring() {
-    const touring = await this.motoRepository.find({
-      where: { categoria: 'Touring' },
-      relations: ['modelo', 'modelo.marca'],
-    });
-    if (!touring || touring.length === 0) {
-      throw new NotFoundException(
-        'No se encontraron motos de la categoria Touring',
-      );
-    }
-    return touring.map((moto) => ({
-      id_generated: moto.id_generated,
-      matricula: moto.matricula,
-      color: moto.color,
-      cantd_km: moto.cantd_km,
-      modelo: moto.modelo?.modelo || 'Sin modelo',
-      marca: moto.modelo?.marca?.marca || 'Sin marca',
-      situacion: moto.situacion,
-      ruta_imagen: moto.ruta_imagen,
-      descripcion: moto.descripcion,
-      categoria: moto.categoria,
-      costo_dia: moto.costo_dia,
-      image: moto.ruta_imagen,
-      price: moto.costo_dia,
-    }));
+    return this.getMotos('Touring');
   }
 
-  //obtener sports motorcicles
+  //obtener sports
   async getSports() {
-    const sports = await this.motoRepository.find({
-      where: { categoria: 'Sport' },
-      relations: ['modelo', 'modelo.marca'],
-    });
-    if (!sports || sports.length === 0) {
-      throw new NotFoundException(
-        'No se encontraron motos de la categoria Sport',
-      );
-    }
-    return sports.map((moto) => ({
-      id_generated: moto.id_generated,
-      matricula: moto.matricula,
-      color: moto.color,
-      cantd_km: moto.cantd_km,
-      modelo: moto.modelo?.modelo || 'Sin modelo',
-      marca: moto.modelo?.marca?.marca || 'Sin marca',
-      situacion: moto.situacion,
-      ruta_imagen: moto.ruta_imagen,
-      descripcion: moto.descripcion,
-      categoria: moto.categoria,
-      costo_dia: moto.costo_dia,
-      image: moto.ruta_imagen,
-      price: moto.costo_dia,
-    }));
+    return this.getMotos('Sport');
   }
 
-  //obtener street motorcicles
+  //obtener street
   async getStreets() {
-    const street = await this.motoRepository.find({
-      where: { categoria: 'Street' },
-      relations: ['modelo', 'modelo.marca'],
-    });
-    if (!street || street.length === 0) {
-      throw new NotFoundException(
-        'No se encontraron motos de la categoria Street',
-      );
-    }
-    return street.map((moto) => ({
-      id_generated: moto.id_generated,
-      matricula: moto.matricula,
-      color: moto.color,
-      cantd_km: moto.cantd_km,
-      modelo: moto.modelo?.modelo || 'Sin modelo',
-      marca: moto.modelo?.marca?.marca || 'Sin marca',
-      situacion: moto.situacion,
-      ruta_imagen: moto.ruta_imagen,
-      descripcion: moto.descripcion,
-      categoria: moto.categoria,
-      costo_dia: moto.costo_dia,
-      image: moto.ruta_imagen,
-      price: moto.costo_dia,
-    }));
+    return this.getMotos('Street');
   }
 
-  //obtener motocross motorcicles
+  //obtener motocross
   async getMotocross() {
-    const motocross = await this.motoRepository.find({
-      where: { categoria: 'Motocross' },
-      relations: ['modelo', 'modelo.marca'],
-    });
-    if (!motocross || motocross.length === 0) {
-      throw new NotFoundException(
-        'No se encontraron motos de la categoria Motocross',
-      );
-    }
-    return motocross.map((moto) => ({
-      id_generated: moto.id_generated,
-      matricula: moto.matricula,
-      color: moto.color,
-      cantd_km: moto.cantd_km,
-      modelo: moto.modelo?.modelo || 'Sin modelo',
-      marca: moto.modelo?.marca?.marca || 'Sin marca',
-      situacion: moto.situacion,
-      ruta_imagen: moto.ruta_imagen,
-      descripcion: moto.descripcion,
-      categoria: moto.categoria,
-      costo_dia: moto.costo_dia,
-      image: moto.ruta_imagen,
-      price: moto.costo_dia,
-    }));
+    return this.getMotos('Motocross');
   }
 
-  //obtener custom motorcicles
+  //obtener custom
   async getCustom() {
-    const custom = await this.motoRepository.find({
-      where: { categoria: 'Custom' },
-      relations: ['modelo', 'modelo.marca'],
-    });
-    if (!custom || custom.length === 0) {
-      throw new NotFoundException(
-        'No se encontraron motos de la categoria Custom',
-      );
-    }
-    return custom.map((moto) => ({
-      id_generated: moto.id_generated,
-      matricula: moto.matricula,
-      color: moto.color,
-      cantd_km: moto.cantd_km,
-      modelo: moto.modelo?.modelo || 'Sin modelo',
-      marca: moto.modelo?.marca?.marca || 'Sin marca',
-      situacion: moto.situacion,
-      ruta_imagen: moto.ruta_imagen,
-      descripcion: moto.descripcion,
-      categoria: moto.categoria,
-      costo_dia: moto.costo_dia,
-      image: moto.ruta_imagen,
-      price: moto.costo_dia,
-    }));
+    return this.getMotos('Custom');
   }
 
+  //crear nuevo contrato
   async crearNuevoContrato(createContractDTO: CreateContractDTO) {
-    // Obtener cliente
+    //buscar cliente
     const cliente = await this.clienteRepository.findOne({
       where: { id_generated: createContractDTO.idCliente },
       relations: ['usuario', 'municipio'],
     });
-
     if (!cliente) {
       throw new NotFoundException('Cliente no encontrado');
     }
 
-    // Comprobar si hay motos libres con la marca y modelo solicitada
+    // Comprobar si la moto solicitada existe
     const moto = await this.motoRepository.findOne({
       where: {
         id_generated: createContractDTO.idMoto,
       },
       relations: ['modelo', 'modelo.marca'],
     });
-
     if (!moto) {
-      throw new NotFoundException(
-        'La moto no esta libre en estos momentos para reserva',
-      );
+      throw new NotFoundException('Moto no encontrada');
     }
 
     // Crear tarifa
@@ -272,15 +159,7 @@ export class ContratoService {
       tarifa_prorroga: 0,
     });
 
-    // Si existe la moto disponible
-    if (moto && cliente) {
-      // Actualizar estado moto a 'A' (alquilada)
-      await this.motoRepository.update(
-        { id_generated: moto.id_generated },
-        { situacion: 'A' },
-      );
-    }
-
+    //comprobar que la moto no este ya en un contrato
     const existeContrato = await this.contratoRepository.findOne({
       where: { moto: { id_generated: moto.id_generated } },
       relations: [
@@ -292,9 +171,15 @@ export class ContratoService {
         'moto.modelo.marca',
       ],
     });
-
     if (existeContrato) {
       throw new ConflictException('La moto ya se encuentra en un contrato');
+    }
+
+    if (moto && cliente && !existeContrato) {
+      await this.motoRepository.update(
+        { id_generated: moto.id_generated },
+        { situacion: 'A' }, //cambiar estado de libre a alquilado
+      );
     }
 
     // Crear contrato
@@ -314,39 +199,6 @@ export class ContratoService {
       const tarifaGuardada = await this.tarifaRepository.save(tarifaTotal);
       const contratoGuardado =
         await this.contratoRepository.save(nuevoContrato);
-      return {
-        contrato: contratoGuardado,
-        tarifa: tarifaGuardada,
-        mensaje: 'Contrato creado exitosamente',
-      };
     }
   }
-
-  /*
-  async findMotoContrato(createContractDTO: CreateContractDTO) {
-    const contratosTerminados = await this.contratoRepository.find({
-      where: {
-        fecha_fin: LessThanOrEqual(createContractDTO.fechaInicio),
-        dias_prorroga: 0,
-      },
-      relations: ['moto', 'moto.modelo', 'moto.modelo.marca'],
-    });
-    const contratosCoincidentes = contratosTerminados.filter((contrato) => {
-      const mismoModelo =
-        contrato.moto.modelo.modelo === createContractDTO.modelo;
-      const mismaMarca =
-        contrato.moto.modelo.marca.marca === createContractDTO.marca;
-      return mismoModelo && mismaMarca;
-    });
-    if (contratosCoincidentes.length === 0) {
-      throw new NotFoundException(
-        'No se encontraron contratos con motos con modelos similares',
-      );
-    }
-    const contratoSeleccionado = contratosCoincidentes.sort(
-      (a, b) =>
-        new Date(b.fecha_fin).getTime() - new Date(a.fecha_fin).getTime(),
-    )[0];
-    return contratoSeleccionado.moto;
-  }*/
 }
