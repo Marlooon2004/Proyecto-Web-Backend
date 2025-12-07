@@ -132,7 +132,9 @@ export class ContratoService {
   }
 
   //crear nuevo contrato
-  async crearNuevoContrato(createContractDTO: CreateContractDTO) {
+  async crearNuevoContrato(
+    createContractDTO: CreateContractDTO,
+  ): Promise<Contrato> {
     //buscar cliente
     const cliente = await this.clienteRepository.findOne({
       where: { id_generated: createContractDTO.idCliente },
@@ -153,52 +155,71 @@ export class ContratoService {
       throw new NotFoundException('Moto no encontrada');
     }
 
+    //comprobar que la moto no este ya en un contrato activo
+    const existeContratoActivo = await this.contratoRepository.findOne({
+      where: {
+        moto: { id_generated: moto.id_generated },
+        contrato_activo: true, //contrato activo en este momento, contratos extendidos por prorroga
+      },
+    });
+    if (existeContratoActivo) {
+      throw new ConflictException(
+        'La moto ya se encuentra en un contrato activo',
+      );
+    }
+
     // Crear tarifa
     const tarifaTotal = this.tarifaRepository.create({
       tarifa_contrato: createContractDTO.costoTotal,
       tarifa_prorroga: 0,
     });
 
-    //comprobar que la moto no este ya en un contrato
-    const existeContrato = await this.contratoRepository.findOne({
-      where: { moto: { id_generated: moto.id_generated } },
-      relations: [
-        'cliente',
-        'cliente.municipio',
-        'cliente.usuario',
-        'moto',
-        'moto.modelo',
-        'moto.modelo.marca',
-      ],
-    });
-    if (existeContrato) {
-      throw new ConflictException('La moto ya se encuentra en un contrato');
-    }
+    const tarifaGuardada = await this.tarifaRepository.save(tarifaTotal);
 
-    if (moto && cliente && !existeContrato) {
-      await this.motoRepository.update(
-        { id_generated: moto.id_generated },
-        { situacion: 'A' }, //cambiar estado de libre a alquilado
-      );
-    }
+    // Cambiar estado de la moto a alquilado
+    await this.motoRepository.update(
+      { id_generated: moto.id_generated },
+      { situacion: 'A' },
+    );
 
     // Crear contrato
-    if (!existeContrato) {
-      const nuevoContrato = new Contrato();
-      nuevoContrato.cliente = cliente;
-      nuevoContrato.fecha_inicio = createContractDTO.fechaInicio;
-      nuevoContrato.fecha_fin = createContractDTO.fechaFin;
-      nuevoContrato.dias_prorroga = 0;
-      nuevoContrato.forma_pago = createContractDTO.formaPago;
-      nuevoContrato.seguro = createContractDTO.seguro;
-      nuevoContrato.tarifa = tarifaTotal;
-      nuevoContrato.moto = moto;
-      nuevoContrato.contrato_activo = true;
-      nuevoContrato.fecha_cancelacion = null;
+    const nuevoContrato = new Contrato();
+    nuevoContrato.cliente = cliente;
+    nuevoContrato.fecha_inicio = this.stringToLocalDate(
+      createContractDTO.fechaInicio,
+    );
+    nuevoContrato.fecha_fin = this.stringToLocalDate(
+      createContractDTO.fechaFin,
+    );
+    nuevoContrato.dias_prorroga = 0;
+    nuevoContrato.forma_pago = createContractDTO.formaPago;
+    nuevoContrato.seguro = createContractDTO.seguro;
+    nuevoContrato.tarifa = tarifaGuardada;
+    nuevoContrato.moto = moto;
 
-      const tarifaGuardada = await this.tarifaRepository.save(tarifaTotal);
-      const contratoGuardado =
-        await this.contratoRepository.save(nuevoContrato);
+    // Obtener fecha actual
+    const fechaActual = new Date();
+    fechaActual.setHours(0, 0, 0, 0);
+
+    const fechaInicioContrato = this.stringToLocalDate(
+      createContractDTO.fechaInicio,
+    );
+    fechaInicioContrato.setHours(0, 0, 0, 0);
+
+    // Comparar fechas
+    if (fechaInicioContrato.getTime() === fechaActual.getTime()) {
+      nuevoContrato.contrato_activo = true;
+    } else {
+      nuevoContrato.contrato_activo = false;
     }
+
+    nuevoContrato.fecha_cancelacion = null;
+
+    const contratoGuardado = await this.contratoRepository.save(nuevoContrato);
+    return contratoGuardado;
+  }
+  private stringToLocalDate(dateString: string): Date {
+    const [year, month, day] = dateString.split('-').map(Number);
+    return new Date(year, month - 1, day, 12, 0, 0, 0);
   }
 }

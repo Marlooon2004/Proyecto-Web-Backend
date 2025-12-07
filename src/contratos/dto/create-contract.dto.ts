@@ -1,10 +1,9 @@
-import { Type } from 'class-transformer';
 import {
   IsString,
   IsNotEmpty,
   IsNumber,
-  IsDate,
   Length,
+  IsDateString,
 } from 'class-validator';
 
 export class CreateContractDTO {
@@ -13,14 +12,12 @@ export class CreateContractDTO {
   idCliente: string;
 
   @IsNotEmpty()
-  @IsDate()
-  @Type(() => Date)
-  fechaInicio: Date;
+  @IsDateString()
+  fechaInicio: string;
 
   @IsNotEmpty()
-  @IsDate()
-  @Type(() => Date)
-  fechaFin: Date;
+  @IsDateString()
+  fechaFin: string;
 
   @IsNotEmpty()
   @IsString()
